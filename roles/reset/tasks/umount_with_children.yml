@@ -7,6 +7,14 @@
   failed_when: false
   changed_when: get_mounted_filesystems.stdout | length > 0
   check_mode: false
+  # with_items: # in main.yml -> Umount k3s filesystems
+  #   - /run/k3s
+  #   - /var/lib/kubelet
+  #   - /run/netns
+  #   - /var/lib/rancher/k3s
+  #   - /var/lib/kubelet/pods
+  #   - /var/lib/kubelet/plugins
+  #   - /run/netns/cni-
 
 - name: Umount filesystem
   mount:

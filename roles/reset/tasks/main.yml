@@ -11,10 +11,10 @@
     - k3s-init
 
 - name: RUN pkill -9 -f "k3s/data/[^/]+/bin/containerd-shim-runc"
-  register: pkill_containerd_shim_runc
   command: pkill -9 -f "k3s/data/[^/]+/bin/containerd-shim-runc"
   changed_when: "pkill_containerd_shim_runc.rc == 0"
   failed_when: false
+  register: pkill_containerd_shim_runc
 
 - name: Umount k3s filesystems
   include_tasks: umount_with_children.yml
@@ -27,7 +27,7 @@
     - /var/lib/kubelet/plugins
     - /run/netns/cni-
   loop_control:
-    loop_var: mounted_fs
+    loop_var: mounted_fs # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html#defining-inner-and-outer-variable-names-with-loop-var
 
 - name: Remove service files, binaries and data
   file:
@@ -55,10 +55,10 @@
     path: /tmp/k3s
     state: absent
 
-- name: Check if rc.local exists
-  stat:
-    path: /etc/rc.local
-  register: rcfile
+# - name: Check if rc.local exists
+#   stat:
+#     path: /etc/rc.local
+#   register: rcfile
 
 # - name: Remove rc.local modifications for proxmox lxc containers
 #   become: true
