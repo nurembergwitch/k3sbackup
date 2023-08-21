@@ -1,0 +1,46 @@
+---
+- name: Basic stuffs
+  hosts: k3scluster
+  remote_user: mads
+  become: true
+  ignore_unreachable: true
+
+  tasks:
+    - name: Update
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: true
+      when: ansible_distribution == "Ubuntu"
+      ignore_errors: true
+    - name: Set same timezone on every Server
+      timezone:
+        name: "{{ system_timezone }}"
+      when: system_timezone is defined
+
+- name: k8s configuation on all nodes
+  hosts: k3scluster
+  become: true
+  roles:
+    - role: download
+
+- name: k8s master configuration
+  hosts: master
+  become: true
+  roles:
+    - role: k8smaster
+      become: true
+
+- name: k8s worker configuration
+  hosts: worker
+  become: true
+  roles:
+    - role: k8sworker
+      become: true
+
+- name: k8s master post-deployment configuration
+  hosts: master
+  become: true
+  roles:
+    - role: post
+      become: true
