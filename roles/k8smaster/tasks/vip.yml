@@ -9,14 +9,26 @@
     mode: 0644
   when: ansible_hostname == hostvars[groups['master'][0]]['ansible_hostname']
 
-- name: Download vip rbac manifest to first master
-  ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/kube-vip/kube-vip/{{ kube_vip_tag_version }}/docs/manifests/rbac.yaml" # kube_vip_tag_version defined in inventory/group_vars/all.yml
-    dest: "/var/lib/rancher/k3s/server/manifests/vip-rbac.yaml"
-    owner: root
-    group: root
-    mode: 0644
-  when: ansible_hostname == hostvars[groups['master'][0]]['ansible_hostname']
+- name: Get vip rbac manifest on the first master
+  block: 
+    - name: Download vip rbac manifest to first master
+      ansible.builtin.get_url:
+        url: "https://raw.githubusercontent.com/kube-vip/kube-vip/{{ kube_vip_tag_version }}/docs/manifests/rbac.yaml" # kube_vip_tag_version defined in inventory/group_vars/all.yml
+        dest: "/var/lib/rancher/k3s/server/manifests/vip-rbac.yaml"
+        owner: root
+        group: root
+        mode: 0644
+      when: ansible_hostname == hostvars[groups['master'][0]]['ansible_hostname']
+
+  rescue:
+    - name: Copy vip rbac manifest to first master if couldn't reach githubusercontent
+      template:
+        src: "viprbac.yaml.j2"
+        dest: "/var/lib/rancher/k3s/server/manifests/vip-rbac.yaml"
+        owner: root
+        group: root
+        mode: 0644
+      when: ansible_hostname == hostvars[groups['master'][0]]['ansible_hostname']
 
 - name: Copy vip manifest to first master
   template:

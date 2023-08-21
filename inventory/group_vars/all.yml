@@ -1,6 +1,6 @@
 system_timezone: Europe/Moscow
 
-k3s_version: v1.27.2+k3s1
+k3s_version: v1.27.4+k3s1 # updated 21.08
 ansible_user: mads
 systemd_dir: /etc/systemd/system
 log_destination: /var/log/k3s
